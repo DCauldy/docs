@@ -134,12 +134,12 @@ paths:
                     state: "TX"
                     zip: "78701"
                     price: 450000
-                    beds: 3
-                    baths: 2
-                    sqft: 1850
+                    bedrooms: 3
+                    bathrooms: 2
+                    square_feet: 1850
                     is_published: true
                     views_count: 45
-                    created_at: "2024-01-15T10:30:00Z"
+                    date_created: "2024-01-15T10:30:00Z"
                 total: 25
                 limit: 50
                 offset: 0
@@ -170,14 +170,13 @@ paths:
               state: "TX"
               zip: "78704"
               price: 525000
-              beds: 4
-              baths: 2.5
-              sqft: 2200
+              bedrooms: 4
+              bathrooms: 2.5
+              square_feet: 2200
               year_built: 2015
               property_type: "Single Family"
               description: "Beautiful home with modern updates"
               custom_agent_name: "Jane Doe"
-              custom_agent_email: "jane@acmerealty.com"
       responses:
         '201':
           description: Report created successfully
@@ -406,12 +405,15 @@ components:
           type: string
         price:
           type: number
-        beds:
+        bedrooms:
           type: integer
-        baths:
+          description: Number of bedrooms
+        bathrooms:
           type: number
-        sqft:
+          description: Number of bathrooms
+        square_feet:
           type: integer
+          description: Total square footage
         year_built:
           type: integer
         property_type:
@@ -432,9 +434,10 @@ components:
           type: integer
         showings_count:
           type: integer
-        created_at:
+        date_created:
           type: string
           format: date-time
+          description: When the report was created
         updated_at:
           type: string
           format: date-time
@@ -456,19 +459,22 @@ components:
         price:
           type: number
           description: Listing price in dollars
-        beds:
+        bedrooms:
           type: integer
-        baths:
+          description: Number of bedrooms (also accepts "beds")
+        bathrooms:
           type: number
-        sqft:
+          description: Number of bathrooms (also accepts "baths")
+        square_feet:
           type: integer
+          description: Total square footage (also accepts "sqft")
         year_built:
           type: integer
         property_type:
           type: string
           description: e.g., "Single Family", "Condo", "Townhouse"
         lot_size:
-          type: number
+          type: string
         description:
           type: string
         zpid:
@@ -486,11 +492,6 @@ components:
           type: boolean
           default: true
         custom_agent_name:
-          type: string
-        custom_agent_email:
-          type: string
-          format: email
-        custom_agent_phone:
           type: string
         custom_logo_url:
           type: string
@@ -521,13 +522,13 @@ components:
               type: string
             price:
               type: number
-            beds:
+            bedrooms:
               type: integer
-            baths:
+            bathrooms:
               type: number
-            sqft:
+            square_feet:
               type: integer
-            created_at:
+            date_created:
               type: string
               format: date-time
         message:
@@ -546,12 +547,15 @@ components:
           type: string
         price:
           type: number
-        beds:
+        bedrooms:
           type: integer
-        baths:
+          description: Number of bedrooms (also accepts "beds")
+        bathrooms:
           type: number
-        sqft:
+          description: Number of bathrooms (also accepts "baths")
+        square_feet:
           type: integer
+          description: Total square footage (also accepts "sqft")
         year_built:
           type: integer
         property_type:
@@ -568,7 +572,7 @@ components:
           type: boolean
         show_neighborhood_on_report:
           type: boolean
-        show_social_media_on_report:
+        show_social_on_report:
           type: boolean
         show_showings_on_report:
           type: boolean
