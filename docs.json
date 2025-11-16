@@ -48,6 +48,26 @@
               "api-reference/reports/update-report",
               "api-reference/reports/delete-report"
             ]
+          },
+          {
+            "group": "Showings",
+            "pages": [
+              "api-reference/showings/list-showings",
+              "api-reference/showings/create-showing",
+              "api-reference/showings/get-showing",
+              "api-reference/showings/update-showing",
+              "api-reference/showings/delete-showing"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "pages": [
+              "api-reference/webhooks/list-webhooks",
+              "api-reference/webhooks/create-webhook",
+              "api-reference/webhooks/get-webhook",
+              "api-reference/webhooks/update-webhook",
+              "api-reference/webhooks/delete-webhook"
+            ]
           }
         ]
       }
