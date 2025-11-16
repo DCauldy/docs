@@ -46,7 +46,19 @@
               "api-reference/reports/create-report",
               "api-reference/reports/get-report",
               "api-reference/reports/update-report",
-              "api-reference/reports/delete-report"
+              "api-reference/reports/delete-report",
+              "api-reference/reports/publish-report",
+              "api-reference/reports/unpublish-report"
+            ]
+          },
+          {
+            "group": "Comparables",
+            "pages": [
+              "api-reference/comps/list-comps",
+              "api-reference/comps/create-comp",
+              "api-reference/comps/get-comp",
+              "api-reference/comps/update-comp",
+              "api-reference/comps/delete-comp"
             ]
           },
           {

@@ -289,6 +289,251 @@ paths:
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
 
+  /v1/reports/{reportId}/publish:
+    post:
+      operationId: publishReport
+      summary: Publish a report
+      description: |
+        Publishes a report, making it publicly accessible. Sets is_published to true and records the published_at timestamp.
+      tags:
+        - Reports
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          description: The report ID to publish
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Report published successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishReportResponse'
+              example:
+                message: "Report published successfully"
+                data:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  address: "123 Main Street"
+                  is_published: true
+                  published_at: "2024-01-15T10:30:00Z"
+                public_url: "https://northreports.com/north/550e8400-e29b-41d4-a716-446655440000"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /v1/reports/{reportId}/unpublish:
+    post:
+      operationId: unpublishReport
+      summary: Unpublish a report
+      description: |
+        Unpublishes a report, making it no longer publicly accessible.
+      tags:
+        - Reports
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          description: The report ID to unpublish
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Report unpublished successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnpublishReportResponse'
+              example:
+                message: "Report unpublished successfully"
+                data:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  address: "123 Main Street"
+                  is_published: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /v1/comps:
+    get:
+      operationId: listComps
+      summary: List comparable properties
+      description: |
+        Returns all comparable properties for a specific report. The report_id query parameter is required.
+      tags:
+        - Comparables
+      parameters:
+        - name: report_id
+          in: query
+          required: true
+          description: The report ID to get comps for
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved comparables
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompsListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    post:
+      operationId: createComp
+      summary: Add a comparable property
+      description: |
+        Adds a new comparable property to a report. The report_id and address are required.
+      tags:
+        - Comparables
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompRequest'
+            example:
+              report_id: "550e8400-e29b-41d4-a716-446655440000"
+              address: "789 Comp Street"
+              city: "Austin"
+              state: "TX"
+              price: 445000
+              bedrooms: 3
+              bathrooms: 2
+              square_feet: 1800
+              status: "Sold"
+              days_on_market: 15
+      responses:
+        '201':
+          description: Comparable added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCompResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /v1/comps/{compId}:
+    get:
+      operationId: getComp
+      summary: Get a specific comparable
+      description: |
+        Retrieves details for a single comparable property.
+      tags:
+        - Comparables
+      parameters:
+        - name: compId
+          in: path
+          required: true
+          description: The comparable property ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved comparable
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Comp'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    patch:
+      operationId: updateComp
+      summary: Update a comparable property
+      description: |
+        Updates an existing comparable property. Only provided fields will be updated.
+      tags:
+        - Comparables
+      parameters:
+        - name: compId
+          in: path
+          required: true
+          description: The comparable property ID to update
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCompRequest'
+      responses:
+        '200':
+          description: Comparable updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateCompResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    delete:
+      operationId: deleteComp
+      summary: Delete a comparable property
+      description: |
+        Permanently deletes a comparable property from a report.
+      tags:
+        - Comparables
+      parameters:
+        - name: compId
+          in: path
+          required: true
+          description: The comparable property ID to delete
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Comparable deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
   /v1/showings:
     get:
       operationId: listShowings
@@ -900,6 +1145,250 @@ components:
               format: date-time
         message:
           type: string
+
+    PublishReportResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            address:
+              type: string
+            is_published:
+              type: boolean
+            published_at:
+              type: string
+              format: date-time
+        public_url:
+          type: string
+          format: uri
+
+    UnpublishReportResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            address:
+              type: string
+            is_published:
+              type: boolean
+
+    CompsListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comp'
+        total:
+          type: integer
+
+    Comp:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        north_id:
+          type: string
+          format: uuid
+          description: The report this comp belongs to
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+        price:
+          type: number
+        bedrooms:
+          type: integer
+        bathrooms:
+          type: number
+        square_feet:
+          type: integer
+        lot_size:
+          type: number
+        price_per_sqft:
+          type: number
+        status:
+          type: string
+          description: e.g., "Sold", "Active", "Pending"
+        days_on_market:
+          type: integer
+        zillow_url:
+          type: string
+          format: uri
+        image_url:
+          type: string
+          format: uri
+        property_type:
+          type: string
+        visible:
+          type: boolean
+          description: Whether to show this comp on the report
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateCompRequest:
+      type: object
+      required:
+        - report_id
+        - address
+      properties:
+        report_id:
+          type: string
+          format: uuid
+          description: The report to add this comp to
+        address:
+          type: string
+          description: Property street address
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+        price:
+          type: number
+        bedrooms:
+          type: integer
+          description: Number of bedrooms (also accepts "beds")
+        bathrooms:
+          type: number
+          description: Number of bathrooms (also accepts "baths")
+        square_feet:
+          type: integer
+          description: Total square footage (also accepts "sqft")
+        lot_size:
+          type: number
+        price_per_sqft:
+          type: number
+        status:
+          type: string
+          description: e.g., "Sold", "Active", "Pending"
+        days_on_market:
+          type: integer
+        zillow_url:
+          type: string
+          format: uri
+        image_url:
+          type: string
+          format: uri
+        property_type:
+          type: string
+        visible:
+          type: boolean
+          default: true
+
+    CreateCompResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            north_id:
+              type: string
+              format: uuid
+            address:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            price:
+              type: number
+            bedrooms:
+              type: integer
+            bathrooms:
+              type: number
+            square_feet:
+              type: integer
+            created_at:
+              type: string
+              format: date-time
+
+    UpdateCompRequest:
+      type: object
+      properties:
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+        price:
+          type: number
+        bedrooms:
+          type: integer
+        bathrooms:
+          type: number
+        square_feet:
+          type: integer
+        lot_size:
+          type: number
+        price_per_sqft:
+          type: number
+        status:
+          type: string
+        days_on_market:
+          type: integer
+        zillow_url:
+          type: string
+          format: uri
+        image_url:
+          type: string
+          format: uri
+        property_type:
+          type: string
+        visible:
+          type: boolean
+
+    UpdateCompResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            north_id:
+              type: string
+              format: uuid
+            address:
+              type: string
+            price:
+              type: number
+            updated_at:
+              type: string
+              format: date-time
 
     ShowingsListResponse:
       type: object
