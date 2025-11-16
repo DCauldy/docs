@@ -13,8 +13,10 @@ The North API uses API keys for authentication. Each key is scoped to your team 
 2. Navigate to **Settings > Integrations**
 3. Click **Create API Key**
 4. Give it a descriptive name (e.g., "Zapier Integration")
-5. Select the permissions you need
+5. Optionally add a description and expiration date
 6. Copy your key immediately - **you won't see it again!**
+
+API keys have full access to your team's data, making it simple to integrate with any service.
 
 <Warning>
   Keep your API key secure! Treat it like a password. Never commit it to version control or share it publicly.
@@ -50,20 +52,19 @@ north_sk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ## Permissions
 
-When creating an API key, you can scope its access:
+API keys have full access to all your team's resources:
 
-| Permission | Actions | Description |
-|------------|---------|-------------|
-| **reports** | read, create, update, delete, publish | Manage North reports |
-| **comps** | read, create, delete | Manage comparable properties |
-| **showings** | read, create, update, delete | Manage showing events |
-| **social** | read, import | Import social media data |
-| **insights** | read, generate | AI-generated insights |
-| **team** | read | View team information |
-| **webhooks** | read, create, update, delete | Manage webhook subscriptions |
+| Resource | Capabilities |
+|----------|-------------|
+| **Reports** | Create, read, update, delete, and publish reports |
+| **Comps** | Manage comparable properties |
+| **Showings** | Track showings and open houses |
+| **Social Media** | Import engagement data |
+| **AI Insights** | Generate summaries and insights |
+| **Team Info** | View team details |
 
 <Tip>
-  Follow the principle of least privilege. Only grant the permissions your integration actually needs.
+  Each API key is scoped to your team only. You cannot access data from other teams.
 </Tip>
 
 ## Common authentication errors
