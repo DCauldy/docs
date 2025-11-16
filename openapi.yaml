@@ -73,16 +73,6 @@ paths:
                   api_key:
                     name: "Production Key"
                     prefix: "north_sk_live_abc12345"
-                    permissions:
-                      reports: ["read", "create", "update"]
-                      comps: ["read"]
-                    rate_limit_tier: "standard"
-                    last_used_at: "2024-01-20T15:45:00Z"
-                    created_at: "2024-01-15T12:00:00Z"
-                  rate_limit:
-                    tier: "standard"
-                    remaining: 985
-                    resets_at: "2024-01-20T17:00:00Z"
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
@@ -352,28 +342,10 @@ components:
               properties:
                 name:
                   type: string
+                  description: Name of the API key being used
                 prefix:
                   type: string
-                permissions:
-                  type: object
-                rate_limit_tier:
-                  type: string
-                last_used_at:
-                  type: string
-                  format: date-time
-                created_at:
-                  type: string
-                  format: date-time
-            rate_limit:
-              type: object
-              properties:
-                tier:
-                  type: string
-                remaining:
-                  type: integer
-                resets_at:
-                  type: string
-                  format: date-time
+                  description: First characters of the API key for identification
 
     ReportsListResponse:
       type: object
