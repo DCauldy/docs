@@ -289,6 +289,335 @@ paths:
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
 
+  /v1/showings:
+    get:
+      operationId: listShowings
+      summary: List showings
+      description: |
+        Returns a list of showings across all reports, or filter by report_id.
+      tags:
+        - Showings
+      parameters:
+        - name: report_id
+          in: query
+          description: Filter showings by report ID
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          description: Maximum number of showings to return
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          description: Number of showings to skip
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Successfully retrieved showings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShowingsListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    post:
+      operationId: createShowing
+      summary: Create a new showing
+      description: |
+        Creates a new showing or open house event for a report.
+      tags:
+        - Showings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateShowingRequest'
+      responses:
+        '201':
+          description: Showing created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateShowingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /v1/showings/{showingId}:
+    get:
+      operationId: getShowing
+      summary: Get a specific showing
+      description: |
+        Retrieves details for a single showing.
+      tags:
+        - Showings
+      parameters:
+        - name: showingId
+          in: path
+          required: true
+          description: The showing ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved showing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Showing'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    patch:
+      operationId: updateShowing
+      summary: Update a showing
+      description: |
+        Updates an existing showing. Only provided fields will be updated.
+      tags:
+        - Showings
+      parameters:
+        - name: showingId
+          in: path
+          required: true
+          description: The showing ID to update
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateShowingRequest'
+      responses:
+        '200':
+          description: Showing updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateShowingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    delete:
+      operationId: deleteShowing
+      summary: Delete a showing
+      description: |
+        Permanently deletes a showing event.
+      tags:
+        - Showings
+      parameters:
+        - name: showingId
+          in: path
+          required: true
+          description: The showing ID to delete
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Showing deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /v1/webhooks:
+    get:
+      operationId: listWebhooks
+      summary: List webhook subscriptions
+      description: |
+        Returns all webhook subscriptions for your team.
+      tags:
+        - Webhooks
+      responses:
+        '200':
+          description: Successfully retrieved webhooks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhooksListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    post:
+      operationId: createWebhook
+      summary: Create a webhook subscription
+      description: |
+        Creates a new webhook subscription. The webhook secret is only returned once at creation time.
+        Use the secret to verify webhook signatures.
+      tags:
+        - Webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookRequest'
+            example:
+              url: "https://hooks.zapier.com/hooks/catch/12345/abcdef/"
+              events: ["report.created", "showing.created"]
+              description: "Zapier automation"
+      responses:
+        '201':
+          description: Webhook created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebhookResponse'
+              example:
+                message: "Webhook created successfully"
+                data:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  url: "https://hooks.zapier.com/hooks/catch/12345/abcdef/"
+                  events: ["report.created", "showing.created"]
+                  is_active: true
+                  description: "Zapier automation"
+                  created_at: "2024-01-15T10:30:00Z"
+                  secret: "whsec_abc123def456..."
+                warning: "Save your webhook secret! It will not be shown again."
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /v1/webhooks/{webhookId}:
+    get:
+      operationId: getWebhook
+      summary: Get a specific webhook
+      description: |
+        Retrieves details for a single webhook subscription.
+      tags:
+        - Webhooks
+      parameters:
+        - name: webhookId
+          in: path
+          required: true
+          description: The webhook ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved webhook
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Webhook'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    patch:
+      operationId: updateWebhook
+      summary: Update a webhook
+      description: |
+        Updates a webhook subscription. Only provided fields will be updated.
+      tags:
+        - Webhooks
+      parameters:
+        - name: webhookId
+          in: path
+          required: true
+          description: The webhook ID to update
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWebhookRequest'
+      responses:
+        '200':
+          description: Webhook updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateWebhookResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    delete:
+      operationId: deleteWebhook
+      summary: Delete a webhook
+      description: |
+        Permanently deletes a webhook subscription. You will no longer receive events for this webhook.
+      tags:
+        - Webhooks
+      parameters:
+        - name: webhookId
+          in: path
+          required: true
+          description: The webhook ID to delete
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Webhook deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -571,6 +900,269 @@ components:
               format: date-time
         message:
           type: string
+
+    ShowingsListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Showing'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    Showing:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        report_id:
+          type: string
+          format: uuid
+        showing_date:
+          type: string
+          format: date-time
+        attendee_name:
+          type: string
+          nullable: true
+        attendee_email:
+          type: string
+          nullable: true
+        attendee_phone:
+          type: string
+          nullable: true
+        agent_name:
+          type: string
+          nullable: true
+        feedback:
+          type: string
+          nullable: true
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        interested:
+          type: boolean
+          nullable: true
+        event_type:
+          type: string
+          enum: [showing, open_house]
+        title:
+          type: string
+          nullable: true
+        attendees_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    CreateShowingRequest:
+      type: object
+      required:
+        - report_id
+      properties:
+        report_id:
+          type: string
+          format: uuid
+          description: The report this showing belongs to
+        showing_date:
+          type: string
+          format: date-time
+          description: Date and time of the showing
+        attendee_name:
+          type: string
+        attendee_email:
+          type: string
+        attendee_phone:
+          type: string
+        agent_name:
+          type: string
+        feedback:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        interested:
+          type: boolean
+        event_type:
+          type: string
+          enum: [showing, open_house]
+          default: showing
+        title:
+          type: string
+        attendees_count:
+          type: integer
+          default: 1
+
+    CreateShowingResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/Showing'
+
+    UpdateShowingRequest:
+      type: object
+      properties:
+        showing_date:
+          type: string
+          format: date-time
+        attendee_name:
+          type: string
+        attendee_email:
+          type: string
+        attendee_phone:
+          type: string
+        agent_name:
+          type: string
+        feedback:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        interested:
+          type: boolean
+        event_type:
+          type: string
+          enum: [showing, open_house]
+        title:
+          type: string
+        attendees_count:
+          type: integer
+
+    UpdateShowingResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/Showing'
+
+    WebhooksListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Webhook'
+
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+            enum:
+              - report.created
+              - report.updated
+              - report.published
+              - report.deleted
+              - showing.created
+              - showing.updated
+              - showing.deleted
+              - comp.added
+              - comp.removed
+        is_active:
+          type: boolean
+        description:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        last_triggered_at:
+          type: string
+          format: date-time
+          nullable: true
+        failure_count:
+          type: integer
+
+    CreateWebhookRequest:
+      type: object
+      required:
+        - url
+        - events
+      properties:
+        url:
+          type: string
+          format: uri
+          description: The URL to send webhook events to (e.g., Zapier, Make.com, n8n)
+        events:
+          type: array
+          items:
+            type: string
+            enum:
+              - report.created
+              - report.updated
+              - report.published
+              - report.deleted
+              - showing.created
+              - showing.updated
+              - showing.deleted
+              - comp.added
+              - comp.removed
+          description: List of event types to subscribe to
+        description:
+          type: string
+          description: Optional description for this webhook
+
+    CreateWebhookResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Webhook'
+            - type: object
+              properties:
+                secret:
+                  type: string
+                  description: Webhook secret for signature verification (only shown once)
+        warning:
+          type: string
+
+    UpdateWebhookRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+        description:
+          type: string
+
+    UpdateWebhookResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/Webhook'
 
     DeleteResponse:
       type: object

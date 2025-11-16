@@ -43,7 +43,7 @@ The North API works seamlessly with:
     Test your connection by fetching your user info:
     ```bash
     curl -X GET \
-      https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1/api-v1-users \
+      https://api.northreports.com/v1/users/me \
       -H "Authorization: Bearer north_sk_live_YOUR_KEY"
     ```
   </Step>
@@ -56,13 +56,12 @@ The North API works seamlessly with:
 
 ### Security
 - Bearer token authentication
-- Scoped permissions per API key
+- Full access API keys (no granular permissions to manage)
 - Automatic key rotation support
 - All requests over HTTPS
 
 ### Rate Limiting
-- Standard tier: 1,000 requests/hour
-- Premium tier: 5,000 requests/hour
+- 100 requests per hour
 - Clear rate limit headers in every response
 
 ### Real-time Updates
@@ -75,7 +74,7 @@ The North API works seamlessly with:
 All API requests are made to:
 
 ```
-https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1
+https://api.northreports.com/v1
 ```
 
 ## Need help?
