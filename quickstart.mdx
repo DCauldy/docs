@@ -1,80 +1,284 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: 'Quickstart'
+description: 'Start using the North API in 5 minutes'
 ---
 
-## Get started in three steps
+# Quickstart Guide
 
-Get your documentation site running locally and make your first customization.
+Get up and running with the North API in just a few minutes.
 
-### Step 1: Set up your local environment
+## Prerequisites
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+- A North account ([sign up here](https://northreports.com/signup))
+- Your API key ([get one here](https://northreports.com/dashboard/settings))
 
-### Step 2: Deploy your changes
+## Step 1: Test your connection
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+Let's verify your API key works by fetching your account info:
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+<CodeGroup>
+```bash cURL
+curl -X GET \
+  "https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1/v1/users/me" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+```javascript JavaScript
+const API_KEY = 'north_sk_live_YOUR_KEY';
+const BASE_URL = 'https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1';
 
-### Step 3: Go live
+const response = await fetch(`${BASE_URL}/v1/users/me`, {
+  headers: {
+    'Authorization': `Bearer ${API_KEY}`
+  }
+});
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+const { data } = await response.json();
+console.log('Team:', data.team.name);
+console.log('Reports:', data.team.reports_count);
+```
+
+```python Python
+import requests
+
+API_KEY = 'north_sk_live_YOUR_KEY'
+BASE_URL = 'https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1'
+
+response = requests.get(
+    f'{BASE_URL}/v1/users/me',
+    headers={'Authorization': f'Bearer {API_KEY}'}
+)
+
+data = response.json()['data']
+print(f"Team: {data['team']['name']}")
+print(f"Reports: {data['team']['reports_count']}")
+```
+</CodeGroup>
+
+You should see your team information and API key details.
+
+## Step 2: List your reports
+
+Fetch all your existing North reports:
+
+<CodeGroup>
+```bash cURL
+curl -X GET \
+  "https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1/v1/reports" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```javascript JavaScript
+const response = await fetch(`${BASE_URL}/v1/reports?limit=10`, {
+  headers: {
+    'Authorization': `Bearer ${API_KEY}`
+  }
+});
+
+const { data, total } = await response.json();
+console.log(`Found ${total} reports`);
+data.forEach(report => {
+  console.log(`- ${report.address}, ${report.city} ($${report.price})`);
+});
+```
+
+```python Python
+response = requests.get(
+    f'{BASE_URL}/v1/reports',
+    params={'limit': 10},
+    headers={'Authorization': f'Bearer {API_KEY}'}
+)
+
+result = response.json()
+print(f"Found {result['total']} reports")
+for report in result['data']:
+    print(f"- {report['address']}, {report['city']} (${report['price']})")
+```
+</CodeGroup>
+
+## Step 3: Create a new report
+
+Let's create a North report programmatically:
+
+<CodeGroup>
+```bash cURL
+curl -X POST \
+  "https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1/v1/reports" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "address": "123 Main Street",
+    "city": "Austin",
+    "state": "TX",
+    "zip": "78701",
+    "price": 450000,
+    "beds": 3,
+    "baths": 2,
+    "sqft": 1850,
+    "year_built": 2010,
+    "property_type": "Single Family"
+  }'
+```
+
+```javascript JavaScript
+const newReport = {
+  address: '123 Main Street',
+  city: 'Austin',
+  state: 'TX',
+  zip: '78701',
+  price: 450000,
+  beds: 3,
+  baths: 2,
+  sqft: 1850,
+  year_built: 2010,
+  property_type: 'Single Family'
+};
+
+const response = await fetch(`${BASE_URL}/v1/reports`, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(newReport)
+});
+
+const { data, message } = await response.json();
+console.log(message);
+console.log('Report ID:', data.id);
+```
+
+```python Python
+new_report = {
+    'address': '123 Main Street',
+    'city': 'Austin',
+    'state': 'TX',
+    'zip': '78701',
+    'price': 450000,
+    'beds': 3,
+    'baths': 2,
+    'sqft': 1850,
+    'year_built': 2010,
+    'property_type': 'Single Family'
+}
+
+response = requests.post(
+    f'{BASE_URL}/v1/reports',
+    json=new_report,
+    headers={'Authorization': f'Bearer {API_KEY}'}
+)
+
+result = response.json()
+print(result['message'])
+print(f"Report ID: {result['data']['id']}")
+```
+</CodeGroup>
+
+<Tip>
+  The report is created as a draft by default. You can update it or publish it later.
+</Tip>
+
+## Step 4: Update the report
+
+Add more details to your report:
+
+<CodeGroup>
+```bash cURL
+curl -X PATCH \
+  "https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1/v1/reports/REPORT_ID" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "description": "Beautiful corner lot with mature trees",
+    "executive_summary": "This charming 3-bed home offers excellent value in a prime Austin location."
+  }'
+```
+
+```javascript JavaScript
+const reportId = 'YOUR_REPORT_ID';
+
+const updates = {
+  description: 'Beautiful corner lot with mature trees',
+  executive_summary: 'This charming 3-bed home offers excellent value in a prime Austin location.'
+};
+
+const response = await fetch(`${BASE_URL}/v1/reports/${reportId}`, {
+  method: 'PATCH',
+  headers: {
+    'Authorization': `Bearer ${API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(updates)
+});
+
+const { message } = await response.json();
+console.log(message);
+```
+
+```python Python
+report_id = 'YOUR_REPORT_ID'
+
+updates = {
+    'description': 'Beautiful corner lot with mature trees',
+    'executive_summary': 'This charming 3-bed home offers excellent value in a prime Austin location.'
+}
+
+response = requests.patch(
+    f'{BASE_URL}/v1/reports/{report_id}',
+    json=updates,
+    headers={'Authorization': f'Bearer {API_KEY}'}
+)
+
+print(response.json()['message'])
+```
+</CodeGroup>
+
+## Understanding rate limits
+
+Every response includes rate limit headers:
+
+```
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 985
+X-RateLimit-Reset: 1705774800
+```
+
+- **Limit**: Maximum requests per hour
+- **Remaining**: How many you have left
+- **Reset**: Unix timestamp when your quota resets
+
+## Error handling
+
+Always check for errors in your code:
+
+```javascript
+const response = await fetch(`${BASE_URL}/v1/reports`, {
+  headers: { 'Authorization': `Bearer ${API_KEY}` }
+});
+
+if (!response.ok) {
+  const error = await response.json();
+  console.error(`Error ${error.error.status}: ${error.error.message}`);
+  return;
+}
+
+const data = await response.json();
+// Process successful response
+```
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="API Reference" icon="book" href="/api-reference/introduction">
+    Explore all available endpoints
+  </Card>
+  <Card title="Zapier Integration" icon="bolt" href="/guides/zapier-integration">
+    Connect North to Zapier
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/guides/webhooks">
+    Get real-time notifications
+  </Card>
+  <Card title="Rate Limits" icon="gauge" href="/rate-limits">
+    Understand usage limits
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

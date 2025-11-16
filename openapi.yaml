@@ -1,0 +1,683 @@
+openapi: 3.1.0
+info:
+  title: North Reports API
+  description: |
+    The North Reports API allows you to programmatically access and manage your North reports.
+
+    Use this API to:
+    - Create and update property reports
+    - Manage comparable properties
+    - Track showings and open houses
+    - Import social media engagement data
+    - Generate AI-powered summaries
+
+    Perfect for integrations with Zapier, n8n, Make.com, or custom applications.
+  version: 1.0.0
+  contact:
+    name: North Support
+    url: https://northreports.com/support
+  termsOfService: https://northreports.com/terms
+
+servers:
+  - url: https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1
+    description: Production API
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Users
+    description: User and team information
+  - name: Reports
+    description: Create and manage North reports
+  - name: Comparables
+    description: Manage comparable properties
+  - name: Showings
+    description: Track showings and open houses
+  - name: Social Media
+    description: Import and track social media engagement
+  - name: Webhooks
+    description: Subscribe to real-time events
+
+paths:
+  /v1/users/me:
+    get:
+      operationId: getCurrentUser
+      summary: Get current user
+      description: |
+        Returns information about the authenticated team, subscription, and API key.
+        This is typically the first endpoint to call to verify your API key is working.
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Successfully retrieved user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+              example:
+                data:
+                  team:
+                    id: "550e8400-e29b-41d4-a716-446655440000"
+                    name: "Acme Realty"
+                    created_at: "2024-01-15T10:30:00Z"
+                    member_count: 3
+                    reports_count: 25
+                  subscription:
+                    plan: "professional"
+                    status: "active"
+                    api_usage:
+                      calls_this_month: 150
+                      resets_at: "2024-02-01T00:00:00Z"
+                  api_key:
+                    name: "Production Key"
+                    prefix: "north_sk_live_abc12345"
+                    permissions:
+                      reports: ["read", "create", "update"]
+                      comps: ["read"]
+                    rate_limit_tier: "standard"
+                    last_used_at: "2024-01-20T15:45:00Z"
+                    created_at: "2024-01-15T12:00:00Z"
+                  rate_limit:
+                    tier: "standard"
+                    remaining: 985
+                    resets_at: "2024-01-20T17:00:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /v1/reports:
+    get:
+      operationId: listReports
+      summary: List all reports
+      description: |
+        Retrieves a paginated list of all reports in your team.
+        Use query parameters to filter and paginate results.
+      tags:
+        - Reports
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of reports to return
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          description: Number of reports to skip for pagination
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: status
+          in: query
+          description: Filter by report status
+          schema:
+            type: string
+            enum: [draft, published, all]
+      responses:
+        '200':
+          description: Successfully retrieved reports
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsListResponse'
+              example:
+                data:
+                  - id: "550e8400-e29b-41d4-a716-446655440000"
+                    address: "123 Main Street"
+                    city: "Austin"
+                    state: "TX"
+                    zip: "78701"
+                    price: 450000
+                    beds: 3
+                    baths: 2
+                    sqft: 1850
+                    is_published: true
+                    views_count: 45
+                    created_at: "2024-01-15T10:30:00Z"
+                total: 25
+                limit: 50
+                offset: 0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    post:
+      operationId: createReport
+      summary: Create a new report
+      description: |
+        Creates a new North report with the provided property information.
+        The report will be created as a draft by default.
+      tags:
+        - Reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReportRequest'
+            example:
+              address: "456 Oak Avenue"
+              city: "Austin"
+              state: "TX"
+              zip: "78704"
+              price: 525000
+              beds: 4
+              baths: 2.5
+              sqft: 2200
+              year_built: 2015
+              property_type: "Single Family"
+              description: "Beautiful home with modern updates"
+              custom_agent_name: "Jane Doe"
+              custom_agent_email: "jane@acmerealty.com"
+      responses:
+        '201':
+          description: Report created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateReportResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /v1/reports/{reportId}:
+    get:
+      operationId: getReport
+      summary: Get a specific report
+      description: |
+        Retrieves a single report with all its details including comparables, showings, and social media posts.
+      tags:
+        - Reports
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          description: The report ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved report
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ReportFull'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    patch:
+      operationId: updateReport
+      summary: Update a report
+      description: |
+        Updates an existing report. Only provided fields will be updated.
+      tags:
+        - Reports
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          description: The report ID to update
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReportRequest'
+      responses:
+        '200':
+          description: Report updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateReportResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    delete:
+      operationId: deleteReport
+      summary: Delete a report
+      description: |
+        Permanently deletes a report and all associated data (comparables, showings, etc.).
+        This action cannot be undone.
+      tags:
+        - Reports
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          description: The report ID to delete
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Report deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        API key authentication. Include your API key in the Authorization header:
+        ```
+        Authorization: Bearer north_sk_live_xxxxxxxxxxxx
+        ```
+
+  schemas:
+    UserResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            team:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+                member_count:
+                  type: integer
+                reports_count:
+                  type: integer
+            subscription:
+              type: object
+              properties:
+                plan:
+                  type: string
+                status:
+                  type: string
+                api_usage:
+                  type: object
+                  properties:
+                    calls_this_month:
+                      type: integer
+                    resets_at:
+                      type: string
+                      format: date-time
+            api_key:
+              type: object
+              properties:
+                name:
+                  type: string
+                prefix:
+                  type: string
+                permissions:
+                  type: object
+                rate_limit_tier:
+                  type: string
+                last_used_at:
+                  type: string
+                  format: date-time
+                created_at:
+                  type: string
+                  format: date-time
+            rate_limit:
+              type: object
+              properties:
+                tier:
+                  type: string
+                remaining:
+                  type: integer
+                resets_at:
+                  type: string
+                  format: date-time
+
+    ReportsListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportSummary'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    ReportSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+        price:
+          type: number
+        beds:
+          type: integer
+        baths:
+          type: number
+        sqft:
+          type: integer
+        year_built:
+          type: integer
+        property_type:
+          type: string
+        status:
+          type: string
+        is_published:
+          type: boolean
+        is_draft:
+          type: boolean
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        views_count:
+          type: integer
+        saves_count:
+          type: integer
+        showings_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateReportRequest:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          type: string
+          description: Property street address
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+        price:
+          type: number
+          description: Listing price in dollars
+        beds:
+          type: integer
+        baths:
+          type: number
+        sqft:
+          type: integer
+        year_built:
+          type: integer
+        property_type:
+          type: string
+          description: e.g., "Single Family", "Condo", "Townhouse"
+        lot_size:
+          type: number
+        description:
+          type: string
+        zpid:
+          type: string
+          description: Zillow property ID
+        zillow_url:
+          type: string
+          format: uri
+        mls_id:
+          type: string
+        status:
+          type: string
+          default: "For Sale"
+        is_draft:
+          type: boolean
+          default: true
+        custom_agent_name:
+          type: string
+        custom_agent_email:
+          type: string
+          format: email
+        custom_agent_phone:
+          type: string
+        custom_logo_url:
+          type: string
+          format: uri
+        primary_brand_color:
+          type: string
+          description: Hex color code
+        secondary_brand_color:
+          type: string
+          description: Hex color code
+
+    CreateReportResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            address:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            zip:
+              type: string
+            price:
+              type: number
+            beds:
+              type: integer
+            baths:
+              type: number
+            sqft:
+              type: integer
+            created_at:
+              type: string
+              format: date-time
+        message:
+          type: string
+
+    UpdateReportRequest:
+      type: object
+      properties:
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+        price:
+          type: number
+        beds:
+          type: integer
+        baths:
+          type: number
+        sqft:
+          type: integer
+        year_built:
+          type: integer
+        property_type:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        is_draft:
+          type: boolean
+        executive_summary:
+          type: string
+        show_comps_on_report:
+          type: boolean
+        show_neighborhood_on_report:
+          type: boolean
+        show_social_media_on_report:
+          type: boolean
+        show_showings_on_report:
+          type: boolean
+        show_agent_insights_on_report:
+          type: boolean
+
+    UpdateReportResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            address:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            updated_at:
+              type: string
+              format: date-time
+        message:
+          type: string
+
+    DeleteResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            status:
+              type: integer
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              message: "Address is required"
+              status: 400
+
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              message: "Invalid API key"
+              status: 401
+
+    Forbidden:
+      description: API key lacks required permission
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              message: "Permission denied: reports:create"
+              status: 403
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              message: "Report not found"
+              status: 404
+
+    RateLimitExceeded:
+      description: Too many requests
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+          description: Request limit per hour
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          description: Remaining requests in current window
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+          description: Unix timestamp when the rate limit resets
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              message: "Rate limit exceeded. Please try again later."
+              status: 429

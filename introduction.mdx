@@ -1,0 +1,90 @@
+---
+title: 'Introduction'
+description: 'Welcome to the North Reports API'
+---
+
+# North Reports API
+
+Build powerful integrations with the North Reports platform. Our RESTful API gives you programmatic access to create, manage, and automate your real estate reports.
+
+## What you can do
+
+<CardGroup cols={2}>
+  <Card title="Create Reports" icon="file-plus">
+    Automatically create North reports from your CRM or other data sources
+  </Card>
+  <Card title="Manage Comparables" icon="chart-mixed">
+    Add and update comparable properties programmatically
+  </Card>
+  <Card title="Track Showings" icon="calendar">
+    Sync showing schedules with your calendar apps
+  </Card>
+  <Card title="Import Social Data" icon="share-nodes">
+    Pull in social media engagement metrics automatically
+  </Card>
+</CardGroup>
+
+## Perfect for automation platforms
+
+The North API works seamlessly with:
+
+- **Zapier** - Connect North to 5,000+ apps
+- **Make.com** - Build complex automation workflows
+- **n8n** - Self-hosted workflow automation
+- **Custom Applications** - Direct REST API integration
+
+## Getting started
+
+<Steps>
+  <Step title="Get your API key">
+    Generate an API key from your [Dashboard Settings > Integrations](https://northreports.com/dashboard/settings)
+  </Step>
+  <Step title="Make your first request">
+    Test your connection by fetching your user info:
+    ```bash
+    curl -X GET \
+      https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1/api-v1-users \
+      -H "Authorization: Bearer north_sk_live_YOUR_KEY"
+    ```
+  </Step>
+  <Step title="Explore the API">
+    Browse the [API Reference](/api-reference/introduction) to see all available endpoints
+  </Step>
+</Steps>
+
+## API Features
+
+### Security
+- Bearer token authentication
+- Scoped permissions per API key
+- Automatic key rotation support
+- All requests over HTTPS
+
+### Rate Limiting
+- Standard tier: 1,000 requests/hour
+- Premium tier: 5,000 requests/hour
+- Clear rate limit headers in every response
+
+### Real-time Updates
+- Webhook subscriptions for events
+- Report published notifications
+- Showing scheduled alerts
+
+## Base URL
+
+All API requests are made to:
+
+```
+https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1
+```
+
+## Need help?
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="book" href="/api-reference/introduction">
+    Complete endpoint documentation
+  </Card>
+  <Card title="Support" icon="headset" href="mailto:support@northreports.com">
+    Contact our support team
+  </Card>
+</CardGroup>
