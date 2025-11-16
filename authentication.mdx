@@ -32,7 +32,7 @@ Authorization: Bearer north_sk_live_xxxxxxxxxxxx
 
 ```bash
 curl -X GET \
-  "https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1/api-v1-users" \
+  "https://api.northreports.com/v1/users/me" \
   -H "Authorization: Bearer north_sk_live_YOUR_KEY_HERE"
 ```
 
@@ -135,13 +135,13 @@ Use the "Get Current User" endpoint to verify your key is working:
 <CodeGroup>
 ```bash cURL
 curl -X GET \
-  "https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1/api-v1-users" \
+  "https://api.northreports.com/v1/users/me" \
   -H "Authorization: Bearer north_sk_live_YOUR_KEY"
 ```
 
 ```javascript JavaScript
 const response = await fetch(
-  'https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1/api-v1-users',
+  'https://api.northreports.com/v1/users/me',
   {
     headers: {
       'Authorization': 'Bearer north_sk_live_YOUR_KEY'
@@ -157,7 +157,7 @@ console.log(data);
 import requests
 
 response = requests.get(
-    'https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1/api-v1-users',
+    'https://api.northreports.com/v1/users/me',
     headers={
         'Authorization': 'Bearer north_sk_live_YOUR_KEY'
     }

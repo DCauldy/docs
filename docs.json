@@ -10,7 +10,7 @@
   "favicon": "/favicon.svg",
   "openapi": ["/openapi.yaml"],
   "api": {
-    "baseUrl": "https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1",
+    "baseUrl": "https://api.northreports.com",
     "auth": {
       "method": "bearer"
     }
