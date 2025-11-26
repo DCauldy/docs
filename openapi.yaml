@@ -95,6 +95,7 @@ paths:
       description: |
         Retrieves a paginated list of all reports in your team.
         Use query parameters to filter and paginate results.
+        You can also search for a specific report by address using the address parameter.
       tags:
         - Reports
       parameters:
@@ -119,6 +120,14 @@ paths:
           schema:
             type: string
             enum: [draft, published, all]
+        - name: address
+          in: query
+          description: |
+            Search for a specific report by address. Returns a single report matching the address.
+            Supports partial matching (case-insensitive).
+            Example: "123 Main St" or "Main Street"
+          schema:
+            type: string
       responses:
         '200':
           description: Successfully retrieved reports
@@ -200,16 +209,19 @@ paths:
       summary: Get a specific report
       description: |
         Retrieves a single report with all its details including comparables, showings, and social media posts.
+        You can search by either the report UUID or by address (supports partial matching).
       tags:
         - Reports
       parameters:
         - name: reportId
           in: path
           required: true
-          description: The report ID
+          description: |
+            The report identifier. Can be either:
+            - A UUID (e.g., `550e8400-e29b-41d4-a716-446655440000`)
+            - An address (e.g., `123 Main St` or `Main Street`) - supports partial matching, case-insensitive
           schema:
             type: string
-            format: uuid
       responses:
         '200':
           description: Successfully retrieved report
