@@ -885,6 +885,16 @@ components:
           type: string
           nullable: true
           description: Unique identifier for the showing event from external systems. Used for deduplication and integration purposes.
+        showing_time_start:
+          type: string
+          format: date-time
+          nullable: true
+          description: Start time of the showing event. Used for API entries to specify exact start time.
+        showing_time_end:
+          type: string
+          format: date-time
+          nullable: true
+          description: End time of the showing event. Used for API entries to specify exact end time.
         created_at:
           type: string
           format: date-time
@@ -939,6 +949,14 @@ components:
         unique_showing_key:
           type: string
           description: Unique identifier for the showing event from external systems. Used for deduplication and integration purposes.
+        showing_time_start:
+          type: string
+          format: date-time
+          description: Start time of the showing event. Used for API entries to specify exact start time.
+        showing_time_end:
+          type: string
+          format: date-time
+          description: End time of the showing event. Used for API entries to specify exact end time.
 
     CreateShowingResponse:
       type: object
@@ -1005,6 +1023,14 @@ components:
         unique_showing_key:
           type: string
           description: Unique identifier for the showing event from external systems. Used for deduplication and integration purposes.
+        showing_time_start:
+          type: string
+          format: date-time
+          description: Start time of the showing event. Used for API entries to specify exact start time.
+        showing_time_end:
+          type: string
+          format: date-time
+          description: End time of the showing event. Used for API entries to specify exact end time.
 
     UpdateShowingResponse:
       type: object
