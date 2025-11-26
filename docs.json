@@ -82,6 +82,18 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Integrations",
+            "pages": [
+              "guides/zapier-integration",
+              "guides/make-integration"
+            ]
+          }
+        ]
       }
     ],
     "global": {
