@@ -19,7 +19,7 @@ info:
   termsOfService: https://northreports.com/terms
 
 servers:
-  - url: https://api.northreports.com
+  - url: https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1
     description: Production API
 
 security:
@@ -73,6 +73,16 @@ paths:
                   api_key:
                     name: "Production Key"
                     prefix: "north_sk_live_abc12345"
+                    permissions:
+                      reports: ["read", "create", "update"]
+                      comps: ["read"]
+                    rate_limit_tier: "standard"
+                    last_used_at: "2024-01-20T15:45:00Z"
+                    created_at: "2024-01-15T12:00:00Z"
+                  rate_limit:
+                    tier: "standard"
+                    remaining: 985
+                    resets_at: "2024-01-20T17:00:00Z"
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
@@ -124,12 +134,12 @@ paths:
                     state: "TX"
                     zip: "78701"
                     price: 450000
-                    bedrooms: 3
-                    bathrooms: 2
-                    square_feet: 1850
+                    beds: 3
+                    baths: 2
+                    sqft: 1850
                     is_published: true
                     views_count: 45
-                    date_created: "2024-01-15T10:30:00Z"
+                    created_at: "2024-01-15T10:30:00Z"
                 total: 25
                 limit: 50
                 offset: 0
@@ -160,13 +170,14 @@ paths:
               state: "TX"
               zip: "78704"
               price: 525000
-              bedrooms: 4
-              bathrooms: 2.5
-              square_feet: 2200
+              beds: 4
+              baths: 2.5
+              sqft: 2200
               year_built: 2015
               property_type: "Single Family"
               description: "Beautiful home with modern updates"
               custom_agent_name: "Jane Doe"
+              custom_agent_email: "jane@acmerealty.com"
       responses:
         '201':
           description: Report created successfully
@@ -289,263 +300,19 @@ paths:
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
 
-  /v1/reports/{reportId}/publish:
-    post:
-      operationId: publishReport
-      summary: Publish a report
-      description: |
-        Publishes a report, making it publicly accessible. Sets is_published to true and records the published_at timestamp.
-      tags:
-        - Reports
-      parameters:
-        - name: reportId
-          in: path
-          required: true
-          description: The report ID to publish
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Report published successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PublishReportResponse'
-              example:
-                message: "Report published successfully"
-                data:
-                  id: "550e8400-e29b-41d4-a716-446655440000"
-                  address: "123 Main Street"
-                  is_published: true
-                  published_at: "2024-01-15T10:30:00Z"
-                public_url: "https://northreports.com/north/550e8400-e29b-41d4-a716-446655440000"
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
-  /v1/reports/{reportId}/unpublish:
-    post:
-      operationId: unpublishReport
-      summary: Unpublish a report
-      description: |
-        Unpublishes a report, making it no longer publicly accessible.
-      tags:
-        - Reports
-      parameters:
-        - name: reportId
-          in: path
-          required: true
-          description: The report ID to unpublish
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Report unpublished successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnpublishReportResponse'
-              example:
-                message: "Report unpublished successfully"
-                data:
-                  id: "550e8400-e29b-41d4-a716-446655440000"
-                  address: "123 Main Street"
-                  is_published: false
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
-  /v1/comps:
-    get:
-      operationId: listComps
-      summary: List comparable properties
-      description: |
-        Returns all comparable properties for a specific report. The report_id query parameter is required.
-      tags:
-        - Comparables
-      parameters:
-        - name: report_id
-          in: query
-          required: true
-          description: The report ID to get comps for
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Successfully retrieved comparables
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CompsListResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
-    post:
-      operationId: createComp
-      summary: Add a comparable property
-      description: |
-        Adds a new comparable property to a report. The report_id and address are required.
-      tags:
-        - Comparables
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateCompRequest'
-            example:
-              report_id: "550e8400-e29b-41d4-a716-446655440000"
-              address: "789 Comp Street"
-              city: "Austin"
-              state: "TX"
-              price: 445000
-              bedrooms: 3
-              bathrooms: 2
-              square_feet: 1800
-              status: "Sold"
-              days_on_market: 15
-      responses:
-        '201':
-          description: Comparable added successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateCompResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
-  /v1/comps/{compId}:
-    get:
-      operationId: getComp
-      summary: Get a specific comparable
-      description: |
-        Retrieves details for a single comparable property.
-      tags:
-        - Comparables
-      parameters:
-        - name: compId
-          in: path
-          required: true
-          description: The comparable property ID
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Successfully retrieved comparable
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Comp'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
-    patch:
-      operationId: updateComp
-      summary: Update a comparable property
-      description: |
-        Updates an existing comparable property. Only provided fields will be updated.
-      tags:
-        - Comparables
-      parameters:
-        - name: compId
-          in: path
-          required: true
-          description: The comparable property ID to update
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateCompRequest'
-      responses:
-        '200':
-          description: Comparable updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdateCompResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
-    delete:
-      operationId: deleteComp
-      summary: Delete a comparable property
-      description: |
-        Permanently deletes a comparable property from a report.
-      tags:
-        - Comparables
-      parameters:
-        - name: compId
-          in: path
-          required: true
-          description: The comparable property ID to delete
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Comparable deleted successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeleteResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
   /v1/showings:
     get:
       operationId: listShowings
-      summary: List showings
+      summary: List all showings
       description: |
-        Returns a list of showings across all reports, or filter by report_id.
+        Retrieves a paginated list of all showings for reports in your team.
+        Use query parameters to filter and paginate results.
       tags:
         - Showings
       parameters:
         - name: report_id
           in: query
-          description: Filter showings by report ID
+          description: Filter by specific report ID
           schema:
             type: string
             format: uuid
@@ -559,10 +326,11 @@ paths:
             maximum: 100
         - name: offset
           in: query
-          description: Number of showings to skip
+          description: Number of showings to skip for pagination
           schema:
             type: integer
             default: 0
+            minimum: 0
       responses:
         '200':
           description: Successfully retrieved showings
@@ -572,6 +340,8 @@ paths:
                 $ref: '#/components/schemas/ShowingsListResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
 
@@ -579,7 +349,7 @@ paths:
       operationId: createShowing
       summary: Create a new showing
       description: |
-        Creates a new showing or open house event for a report.
+        Creates a new showing event for a report.
       tags:
         - Showings
       requestBody:
@@ -588,6 +358,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateShowingRequest'
+            example:
+              report_id: "550e8400-e29b-41d4-a716-446655440000"
+              showing_date: "2024-01-20T14:00:00Z"
+              attendee_name: "John Buyer"
+              attendee_email: "john@example.com"
+              attendee_phone: "(555) 123-4567"
+              event_type: "showing"
+              title: "Property Showing"
+              unique_showing_key: "ext_12345"
       responses:
         '201':
           description: Showing created successfully
@@ -599,6 +378,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
 
@@ -607,17 +388,20 @@ paths:
       operationId: getShowing
       summary: Get a specific showing
       description: |
-        Retrieves details for a single showing.
+        Retrieves a single showing event with all its details.
+        You can search by either the showing UUID or the unique_showing_key.
       tags:
         - Showings
       parameters:
         - name: showingId
           in: path
           required: true
-          description: The showing ID
+          description: |
+            The showing identifier. Can be either:
+            - A UUID (e.g., `550e8400-e29b-41d4-a716-446655440000`)
+            - A unique showing key (e.g., `ext_12345`)
           schema:
             type: string
-            format: uuid
       responses:
         '200':
           description: Successfully retrieved showing
@@ -630,6 +414,8 @@ paths:
                     $ref: '#/components/schemas/Showing'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '429':
@@ -640,16 +426,19 @@ paths:
       summary: Update a showing
       description: |
         Updates an existing showing. Only provided fields will be updated.
+        You can identify the showing by either UUID or unique_showing_key.
       tags:
         - Showings
       parameters:
         - name: showingId
           in: path
           required: true
-          description: The showing ID to update
+          description: |
+            The showing identifier. Can be either:
+            - A UUID (e.g., `550e8400-e29b-41d4-a716-446655440000`)
+            - A unique showing key (e.g., `ext_12345`)
           schema:
             type: string
-            format: uuid
       requestBody:
         required: true
         content:
@@ -667,6 +456,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '429':
@@ -677,16 +468,20 @@ paths:
       summary: Delete a showing
       description: |
         Permanently deletes a showing event.
+        This action cannot be undone.
+        You can identify the showing by either UUID or unique_showing_key.
       tags:
         - Showings
       parameters:
         - name: showingId
           in: path
           required: true
-          description: The showing ID to delete
+          description: |
+            The showing identifier. Can be either:
+            - A UUID (e.g., `550e8400-e29b-41d4-a716-446655440000`)
+            - A unique showing key (e.g., `ext_12345`)
           schema:
             type: string
-            format: uuid
       responses:
         '200':
           description: Showing deleted successfully
@@ -696,168 +491,8 @@ paths:
                 $ref: '#/components/schemas/DeleteResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
-  /v1/webhooks:
-    get:
-      operationId: listWebhooks
-      summary: List webhook subscriptions
-      description: |
-        Returns all webhook subscriptions for your team.
-      tags:
-        - Webhooks
-      responses:
-        '200':
-          description: Successfully retrieved webhooks
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WebhooksListResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
-    post:
-      operationId: createWebhook
-      summary: Create a webhook subscription
-      description: |
-        Creates a new webhook subscription. The webhook secret is only returned once at creation time.
-        Use the secret to verify webhook signatures.
-      tags:
-        - Webhooks
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateWebhookRequest'
-            example:
-              url: "https://hooks.zapier.com/hooks/catch/12345/abcdef/"
-              events: ["report.created", "showing.created"]
-              description: "Zapier automation"
-      responses:
-        '201':
-          description: Webhook created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateWebhookResponse'
-              example:
-                message: "Webhook created successfully"
-                data:
-                  id: "550e8400-e29b-41d4-a716-446655440000"
-                  url: "https://hooks.zapier.com/hooks/catch/12345/abcdef/"
-                  events: ["report.created", "showing.created"]
-                  is_active: true
-                  description: "Zapier automation"
-                  created_at: "2024-01-15T10:30:00Z"
-                  secret: "whsec_abc123def456..."
-                warning: "Save your webhook secret! It will not be shown again."
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
-  /v1/webhooks/{webhookId}:
-    get:
-      operationId: getWebhook
-      summary: Get a specific webhook
-      description: |
-        Retrieves details for a single webhook subscription.
-      tags:
-        - Webhooks
-      parameters:
-        - name: webhookId
-          in: path
-          required: true
-          description: The webhook ID
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Successfully retrieved webhook
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Webhook'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
-    patch:
-      operationId: updateWebhook
-      summary: Update a webhook
-      description: |
-        Updates a webhook subscription. Only provided fields will be updated.
-      tags:
-        - Webhooks
-      parameters:
-        - name: webhookId
-          in: path
-          required: true
-          description: The webhook ID to update
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateWebhookRequest'
-      responses:
-        '200':
-          description: Webhook updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdateWebhookResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimitExceeded'
-
-    delete:
-      operationId: deleteWebhook
-      summary: Delete a webhook
-      description: |
-        Permanently deletes a webhook subscription. You will no longer receive events for this webhook.
-      tags:
-        - Webhooks
-      parameters:
-        - name: webhookId
-          in: path
-          required: true
-          description: The webhook ID to delete
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Webhook deleted successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeleteResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '429':
@@ -916,10 +551,28 @@ components:
               properties:
                 name:
                   type: string
-                  description: Name of the API key being used
                 prefix:
                   type: string
-                  description: First characters of the API key for identification
+                permissions:
+                  type: object
+                rate_limit_tier:
+                  type: string
+                last_used_at:
+                  type: string
+                  format: date-time
+                created_at:
+                  type: string
+                  format: date-time
+            rate_limit:
+              type: object
+              properties:
+                tier:
+                  type: string
+                remaining:
+                  type: integer
+                resets_at:
+                  type: string
+                  format: date-time
 
     ReportsListResponse:
       type: object
@@ -951,15 +604,12 @@ components:
           type: string
         price:
           type: number
-        bedrooms:
+        beds:
           type: integer
-          description: Number of bedrooms
-        bathrooms:
+        baths:
           type: number
-          description: Number of bathrooms
-        square_feet:
+        sqft:
           type: integer
-          description: Total square footage
         year_built:
           type: integer
         property_type:
@@ -980,10 +630,9 @@ components:
           type: integer
         showings_count:
           type: integer
-        date_created:
+        created_at:
           type: string
           format: date-time
-          description: When the report was created
         updated_at:
           type: string
           format: date-time
@@ -1005,22 +654,19 @@ components:
         price:
           type: number
           description: Listing price in dollars
-        bedrooms:
+        beds:
           type: integer
-          description: Number of bedrooms (also accepts "beds")
-        bathrooms:
+        baths:
           type: number
-          description: Number of bathrooms (also accepts "baths")
-        square_feet:
+        sqft:
           type: integer
-          description: Total square footage (also accepts "sqft")
         year_built:
           type: integer
         property_type:
           type: string
           description: e.g., "Single Family", "Condo", "Townhouse"
         lot_size:
-          type: string
+          type: number
         description:
           type: string
         zpid:
@@ -1038,6 +684,11 @@ components:
           type: boolean
           default: true
         custom_agent_name:
+          type: string
+        custom_agent_email:
+          type: string
+          format: email
+        custom_agent_phone:
           type: string
         custom_logo_url:
           type: string
@@ -1068,13 +719,13 @@ components:
               type: string
             price:
               type: number
-            bedrooms:
+            beds:
               type: integer
-            bathrooms:
+            baths:
               type: number
-            square_feet:
+            sqft:
               type: integer
-            date_created:
+            created_at:
               type: string
               format: date-time
         message:
@@ -1093,15 +744,12 @@ components:
           type: string
         price:
           type: number
-        bedrooms:
+        beds:
           type: integer
-          description: Number of bedrooms (also accepts "beds")
-        bathrooms:
+        baths:
           type: number
-          description: Number of bathrooms (also accepts "baths")
-        square_feet:
+        sqft:
           type: integer
-          description: Total square footage (also accepts "sqft")
         year_built:
           type: integer
         property_type:
@@ -1118,7 +766,7 @@ components:
           type: boolean
         show_neighborhood_on_report:
           type: boolean
-        show_social_on_report:
+        show_social_media_on_report:
           type: boolean
         show_showings_on_report:
           type: boolean
@@ -1146,250 +794,6 @@ components:
         message:
           type: string
 
-    PublishReportResponse:
-      type: object
-      properties:
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uuid
-            address:
-              type: string
-            is_published:
-              type: boolean
-            published_at:
-              type: string
-              format: date-time
-        public_url:
-          type: string
-          format: uri
-
-    UnpublishReportResponse:
-      type: object
-      properties:
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uuid
-            address:
-              type: string
-            is_published:
-              type: boolean
-
-    CompsListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Comp'
-        total:
-          type: integer
-
-    Comp:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        north_id:
-          type: string
-          format: uuid
-          description: The report this comp belongs to
-        address:
-          type: string
-        city:
-          type: string
-        state:
-          type: string
-        zip:
-          type: string
-        price:
-          type: number
-        bedrooms:
-          type: integer
-        bathrooms:
-          type: number
-        square_feet:
-          type: integer
-        lot_size:
-          type: number
-        price_per_sqft:
-          type: number
-        status:
-          type: string
-          description: e.g., "Sold", "Active", "Pending"
-        days_on_market:
-          type: integer
-        zillow_url:
-          type: string
-          format: uri
-        image_url:
-          type: string
-          format: uri
-        property_type:
-          type: string
-        visible:
-          type: boolean
-          description: Whether to show this comp on the report
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-
-    CreateCompRequest:
-      type: object
-      required:
-        - report_id
-        - address
-      properties:
-        report_id:
-          type: string
-          format: uuid
-          description: The report to add this comp to
-        address:
-          type: string
-          description: Property street address
-        city:
-          type: string
-        state:
-          type: string
-        zip:
-          type: string
-        price:
-          type: number
-        bedrooms:
-          type: integer
-          description: Number of bedrooms (also accepts "beds")
-        bathrooms:
-          type: number
-          description: Number of bathrooms (also accepts "baths")
-        square_feet:
-          type: integer
-          description: Total square footage (also accepts "sqft")
-        lot_size:
-          type: number
-        price_per_sqft:
-          type: number
-        status:
-          type: string
-          description: e.g., "Sold", "Active", "Pending"
-        days_on_market:
-          type: integer
-        zillow_url:
-          type: string
-          format: uri
-        image_url:
-          type: string
-          format: uri
-        property_type:
-          type: string
-        visible:
-          type: boolean
-          default: true
-
-    CreateCompResponse:
-      type: object
-      properties:
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uuid
-            north_id:
-              type: string
-              format: uuid
-            address:
-              type: string
-            city:
-              type: string
-            state:
-              type: string
-            price:
-              type: number
-            bedrooms:
-              type: integer
-            bathrooms:
-              type: number
-            square_feet:
-              type: integer
-            created_at:
-              type: string
-              format: date-time
-
-    UpdateCompRequest:
-      type: object
-      properties:
-        address:
-          type: string
-        city:
-          type: string
-        state:
-          type: string
-        zip:
-          type: string
-        price:
-          type: number
-        bedrooms:
-          type: integer
-        bathrooms:
-          type: number
-        square_feet:
-          type: integer
-        lot_size:
-          type: number
-        price_per_sqft:
-          type: number
-        status:
-          type: string
-        days_on_market:
-          type: integer
-        zillow_url:
-          type: string
-          format: uri
-        image_url:
-          type: string
-          format: uri
-        property_type:
-          type: string
-        visible:
-          type: boolean
-
-    UpdateCompResponse:
-      type: object
-      properties:
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uuid
-            north_id:
-              type: string
-              format: uuid
-            address:
-              type: string
-            price:
-              type: number
-            updated_at:
-              type: string
-              format: date-time
-
     ShowingsListResponse:
       type: object
       properties:
@@ -1410,12 +814,18 @@ components:
         id:
           type: string
           format: uuid
-        report_id:
+        north_id:
           type: string
           format: uuid
+          description: The report ID this showing belongs to
         showing_date:
           type: string
           format: date-time
+          description: Date and time of the showing
+        scheduled_date:
+          type: string
+          format: date-time
+          description: Scheduled date and time of the showing
         attendee_name:
           type: string
           nullable: true
@@ -1433,23 +843,33 @@ components:
           nullable: true
         rating:
           type: integer
+          nullable: true
           minimum: 1
           maximum: 5
-          nullable: true
         interested:
           type: boolean
           nullable: true
         event_type:
           type: string
           enum: [showing, open_house]
+          default: showing
         title:
           type: string
           nullable: true
         attendees_count:
           type: integer
+          default: 0
+        unique_showing_key:
+          type: string
+          nullable: true
+          description: Unique identifier for the showing event from external systems. Used for deduplication and integration purposes.
         created_at:
           type: string
           format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
 
     CreateShowingRequest:
       type: object
@@ -1459,15 +879,20 @@ components:
         report_id:
           type: string
           format: uuid
-          description: The report this showing belongs to
+          description: The report ID this showing belongs to
         showing_date:
           type: string
           format: date-time
           description: Date and time of the showing
+        scheduled_date:
+          type: string
+          format: date-time
+          description: Scheduled date and time of the showing
         attendee_name:
           type: string
         attendee_email:
           type: string
+          format: email
         attendee_phone:
           type: string
         agent_name:
@@ -1489,14 +914,38 @@ components:
         attendees_count:
           type: integer
           default: 1
+        unique_showing_key:
+          type: string
+          description: Unique identifier for the showing event from external systems. Used for deduplication and integration purposes.
 
     CreateShowingResponse:
       type: object
       properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            north_id:
+              type: string
+              format: uuid
+            showing_date:
+              type: string
+              format: date-time
+            attendee_name:
+              type: string
+              nullable: true
+            attendee_email:
+              type: string
+              nullable: true
+            event_type:
+              type: string
+            created_at:
+              type: string
+              format: date-time
         message:
           type: string
-        data:
-          $ref: '#/components/schemas/Showing'
 
     UpdateShowingRequest:
       type: object
@@ -1504,10 +953,14 @@ components:
         showing_date:
           type: string
           format: date-time
+        scheduled_date:
+          type: string
+          format: date-time
         attendee_name:
           type: string
         attendee_email:
           type: string
+          format: email
         attendee_phone:
           type: string
         agent_name:
@@ -1527,131 +980,33 @@ components:
           type: string
         attendees_count:
           type: integer
+        unique_showing_key:
+          type: string
+          description: Unique identifier for the showing event from external systems. Used for deduplication and integration purposes.
 
     UpdateShowingResponse:
       type: object
       properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            north_id:
+              type: string
+              format: uuid
+            showing_date:
+              type: string
+              format: date-time
+            feedback:
+              type: string
+              nullable: true
+            updated_at:
+              type: string
+              format: date-time
         message:
           type: string
-        data:
-          $ref: '#/components/schemas/Showing'
-
-    WebhooksListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Webhook'
-
-    Webhook:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        url:
-          type: string
-          format: uri
-        events:
-          type: array
-          items:
-            type: string
-            enum:
-              - report.created
-              - report.updated
-              - report.published
-              - report.deleted
-              - showing.created
-              - showing.updated
-              - showing.deleted
-              - comp.added
-              - comp.removed
-        is_active:
-          type: boolean
-        description:
-          type: string
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        last_triggered_at:
-          type: string
-          format: date-time
-          nullable: true
-        failure_count:
-          type: integer
-
-    CreateWebhookRequest:
-      type: object
-      required:
-        - url
-        - events
-      properties:
-        url:
-          type: string
-          format: uri
-          description: The URL to send webhook events to (e.g., Zapier, Make.com, n8n)
-        events:
-          type: array
-          items:
-            type: string
-            enum:
-              - report.created
-              - report.updated
-              - report.published
-              - report.deleted
-              - showing.created
-              - showing.updated
-              - showing.deleted
-              - comp.added
-              - comp.removed
-          description: List of event types to subscribe to
-        description:
-          type: string
-          description: Optional description for this webhook
-
-    CreateWebhookResponse:
-      type: object
-      properties:
-        message:
-          type: string
-        data:
-          allOf:
-            - $ref: '#/components/schemas/Webhook'
-            - type: object
-              properties:
-                secret:
-                  type: string
-                  description: Webhook secret for signature verification (only shown once)
-        warning:
-          type: string
-
-    UpdateWebhookRequest:
-      type: object
-      properties:
-        url:
-          type: string
-          format: uri
-        events:
-          type: array
-          items:
-            type: string
-        is_active:
-          type: boolean
-        description:
-          type: string
-
-    UpdateWebhookResponse:
-      type: object
-      properties:
-        message:
-          type: string
-        data:
-          $ref: '#/components/schemas/Webhook'
 
     DeleteResponse:
       type: object
