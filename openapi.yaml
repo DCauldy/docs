@@ -19,7 +19,7 @@ info:
   termsOfService: https://northreports.com/terms
 
 servers:
-  - url: https://api.northreports.com/v1
+  - url: https://api.northreports.com
     description: Production API
 
 security:
