@@ -1,0 +1,311 @@
+---
+title: 'Make.com Integration'
+description: 'Connect North Reports with Make.com (formerly Integromat) for powerful automation workflows'
+---
+
+# Make.com Integration
+
+Make.com (formerly Integromat) is a powerful visual automation platform that lets you connect North Reports with thousands of other apps.
+
+## Get Started
+
+### Private App Invite
+
+To use the North Reports Make.com integration, you'll need to accept our private app invitation:
+
+<Card title="Accept Make.com Invite" icon="bolt" href="https://www.make.com/en/hq/app-invitation/ff40a79f574a3d567cc7a37050c18187">
+  Click here to accept the invitation and add North Reports to your Make.com account
+</Card>
+
+After accepting the invite, you'll be able to search for "North Reports" when creating new scenarios.
+
+## Quick Start: Using HTTP Modules
+
+The fastest way to use North Reports with Make is through HTTP modules. No custom app needed!
+
+### Step 1: Get Your API Key
+
+1. Log into [North Dashboard](https://northreports.com/dashboard)
+2. Go to **Settings → Integrations**
+3. Click **Create API Key**
+4. Name it "Make.com Integration"
+5. Copy the key (starts with `north_sk_live_`)
+
+### Step 2: Create Your First Scenario
+
+1. Go to [Make.com](https://make.com)
+2. Click **Create a new scenario**
+3. Search for **HTTP** and add the **Make a request** module
+
+### Step 3: Configure Authentication
+
+In the HTTP module:
+
+**URL**: `https://api.northreports.com/v1/users/me`
+
+**Method**: `GET`
+
+**Headers**:
+```
+Authorization: Bearer north_sk_live_YOUR_KEY_HERE
+Content-Type: application/json
+```
+
+Click **OK** and **Run once** to test the connection.
+
+## Common Use Cases
+
+### 1. New Report → Send Email
+
+**Scenario**: When a new North Report is created, send an email notification.
+
+**Setup**:
+1. **Trigger** (HTTP): Poll `GET /v1/reports` every 15 minutes
+2. **Filter**: Only new reports (created in last 15 min)
+3. **Action** (Email): Send notification with report details
+
+### 2. New Contact → Create Report
+
+**Scenario**: When a new contact is added to your CRM, automatically create a North Report.
+
+**Setup**:
+1. **Trigger** (CRM): New contact webhook
+2. **Action** (HTTP): `POST /v1/reports` with contact data
+3. **Action** (Email): Notify team
+
+### 3. Showing Scheduled → Update Calendar
+
+**Scenario**: When a showing is scheduled, add it to Google Calendar.
+
+**Setup**:
+1. **Trigger** (HTTP): Poll `GET /v1/showings`
+2. **Filter**: Only new showings
+3. **Action** (Google Calendar): Create event
+
+## API Endpoints Reference
+
+### Authentication
+
+All requests require the `Authorization` header:
+```
+Authorization: Bearer north_sk_live_YOUR_KEY_HERE
+```
+
+### List Reports
+
+**GET** `https://api.northreports.com/v1/reports`
+
+**Query Parameters**:
+- `limit` (optional): Number of reports to return (default: 50)
+- `offset` (optional): Pagination offset (default: 0)
+- `status` (optional): Filter by status (`published`, `draft`)
+
+**Response**:
+```json
+{
+  "data": [
+    {
+      "id": "rpt_123",
+      "address": "123 Main St",
+      "city": "Austin",
+      "state": "TX",
+      "price": 599000,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "square_feet": 1850,
+      "status": "For Sale",
+      "is_published": true,
+      "created_at": "2025-01-15T10:30:00Z"
+    }
+  ],
+  "total": 25,
+  "limit": 50,
+  "offset": 0
+}
+```
+
+### Create Report
+
+**POST** `https://api.northreports.com/v1/reports`
+
+**Body**:
+```json
+{
+  "address": "123 Main St",
+  "city": "Austin",
+  "state": "TX",
+  "zip": "78701",
+  "price": 599000,
+  "beds": 3,
+  "baths": 2,
+  "sqft": 1850,
+  "zillow_url": "https://www.zillow.com/...",
+  "mls_id": "MLS123456"
+}
+```
+
+### List Showings
+
+**GET** `https://api.northreports.com/v1/showings`
+
+**Query Parameters**:
+- `report_id` (optional): Filter by specific report
+- `limit` (optional): Number of showings to return
+- `offset` (optional): Pagination offset
+
+### Create Showing
+
+**POST** `https://api.northreports.com/v1/showings`
+
+**Body**:
+```json
+{
+  "report_id": "rpt_123",
+  "showing_date": "2025-01-20T14:00:00Z",
+  "attendee_name": "John Buyer",
+  "attendee_email": "john@example.com",
+  "attendee_phone": "(555) 123-4567",
+  "event_type": "showing"
+}
+```
+
+### Add Comparable Property
+
+**POST** `https://api.northreports.com/v1/comparables`
+
+**Body**:
+```json
+{
+  "report_id": "rpt_123",
+  "address": "125 Main St",
+  "price": 585000,
+  "beds": 3,
+  "baths": 2,
+  "sqft": 1820,
+  "status": "Sold"
+}
+```
+
+## Advanced: Using the North Reports App
+
+The North Reports app is now available in Make.com! After accepting the invite above, you can use the dedicated North Reports modules instead of HTTP modules.
+
+### Benefits of Using the App
+- Appears in Make's app search
+- Pre-configured authentication
+- Visual module builder
+- Better user experience
+- Automatic updates
+- Built-in error handling
+- Pre-mapped fields
+
+### Available Modules
+
+**Triggers:**
+- New Report - Triggers when a new report is created
+
+**Actions:**
+- Create Report - Creates a new North Report
+- Update Report - Updates an existing report
+- Get Report - Retrieves a report by ID
+- List Reports - Lists all reports with filters
+
+### Switching from HTTP to App Modules
+
+If you're currently using HTTP modules, you can easily switch:
+1. Delete your HTTP module
+2. Add the corresponding North Reports module
+3. Reconnect your account (uses the same API key)
+4. Map your fields (they should match automatically)
+
+## Polling Best Practices
+
+When using HTTP modules to poll for new data:
+
+1. **Use appropriate intervals**: 15 minutes is usually sufficient
+2. **Store last check time**: Use Make's data stores to track the last poll
+3. **Filter results**: Only process items created since last check
+4. **Respect rate limits**: Max 100 requests per hour on the free plan
+
+## Example: Complete Automation
+
+Here's a complete Make scenario that:
+1. Polls for new reports every 15 minutes
+2. Creates a task in Asana for each new report
+3. Sends a Slack notification to your team
+
+**Module 1: HTTP - Get Reports**
+```
+URL: https://api.northreports.com/v1/reports?limit=10
+Method: GET
+Headers:
+  Authorization: Bearer north_sk_live_xxx
+  Content-Type: application/json
+```
+
+**Module 2: Iterator**
+Parse the reports array
+
+**Module 3: Filter**
+```
+created_at > {{datastore.last_check}}
+```
+
+**Module 4: Asana - Create Task**
+```
+Project: North Reports
+Name: New Report: {{address}}
+Notes: Price: ${{price}}, Beds: {{bedrooms}}, Baths: {{bathrooms}}
+```
+
+**Module 5: Slack - Send Message**
+```
+Channel: #real-estate
+Message: New North Report created: {{address}}
+Link: https://northreports.com/north/{{id}}
+```
+
+**Module 6: Update Data Store**
+```
+Store: last_check
+Value: {{now}}
+```
+
+## Error Handling
+
+Make.com has built-in error handling:
+
+1. **Add Error Handler** to any module
+2. **Configure retry logic** for transient failures
+3. **Set up notifications** for critical errors
+4. **Use fallback actions** when API is unavailable
+
+## Rate Limits
+
+North Reports API has these limits:
+
+| Plan | Requests/Hour |
+|------|---------------|
+| Free | 100 |
+| Pro  | 500 |
+| Enterprise | 10,000 |
+
+Rate limit headers are included in every response:
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1642348800
+```
+
+## Support
+
+Need help? Contact us:
+- **Email**: support@northreports.com
+- **Docs**: https://docs.northreports.com
+- **API Reference**: https://docs.northreports.com/api-reference
+
+## Next Steps
+
+- [View full API Reference](/api-reference/introduction)
+- [Check out Zapier Integration](/guides/zapier-integration)
+- [Explore Webhooks](/guides/webhooks)

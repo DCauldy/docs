@@ -1,0 +1,303 @@
+---
+title: 'Zapier Integration'
+description: 'Connect North Reports with Zapier for powerful automation workflows'
+---
+
+# Zapier Integration
+
+Zapier is the easiest way to connect North Reports with 5,000+ apps. Automate your real estate workflows without writing any code.
+
+## Get Started
+
+### Private App Invite
+
+To use the North Reports Zapier integration, you'll need to accept our private app invitation:
+
+<Card title="Accept Zapier Invite" icon="bolt" href="https://zapier.com/developer/public-invite/233419/b86363726ce13e78be4b1ff823e3cdab/">
+  Click here to accept the invitation and add North Reports to your Zapier account
+</Card>
+
+After accepting the invite, you'll be able to search for "North Reports" when creating new Zaps.
+
+## Quick Start: Your First Zap
+
+### Step 1: Get Your API Key
+
+1. Log into [North Dashboard](https://northreports.com/dashboard)
+2. Go to **Settings → Integrations**
+3. Click **Create API Key**
+4. Name it "Zapier Integration"
+5. Copy the key (starts with `north_sk_live_`)
+
+### Step 2: Create Your First Zap
+
+1. Go to [Zapier](https://zapier.com)
+2. Click **Create Zap**
+3. Search for **North Reports** in the trigger or action search
+4. Select the North Reports app
+5. Choose your trigger or action
+
+### Step 3: Connect Your Account
+
+When setting up a North Reports step:
+
+1. Click **Sign in** or **Connect a new account**
+2. Enter your API key from Step 1
+3. Click **Yes, Continue**
+4. Test the connection
+
+## Available Triggers
+
+### New Report
+
+Fires when a new North Report is created in your account.
+
+**Use Cases:**
+- Notify your team in Slack when a new report is created
+- Add new reports to a Google Sheet
+- Send email notifications to clients
+- Create tasks in your project management tool
+
+**Output Fields:**
+- Report ID
+- Address
+- City, State, ZIP
+- Price
+- Bedrooms, Bathrooms
+- Square Feet
+- Status
+- Created Date
+- Report URL
+
+## Available Actions
+
+### Create Report
+
+Creates a new North Report from property data.
+
+**Input Fields:**
+- Address (required)
+- City (required)
+- State (required)
+- ZIP Code (required)
+- Price
+- Bedrooms
+- Bathrooms
+- Square Feet
+- Year Built
+- Property Type
+- MLS ID
+- Zillow URL
+
+**Use Cases:**
+- Automatically create reports when a new contact is added to your CRM
+- Generate reports from new listings in your MLS system
+- Create reports from form submissions
+- Sync property data from other real estate platforms
+
+### Update Report
+
+Updates an existing North Report with new information.
+
+**Input Fields:**
+- Report ID (required)
+- Price
+- Status
+- Description
+- Executive Summary
+- Any other report fields
+
+**Use Cases:**
+- Update report prices when they change in your CRM
+- Sync status changes from other systems
+- Add descriptions or notes automatically
+
+## Example Zaps
+
+### Example 1: CRM → North Report
+
+**Trigger:** New Contact in HubSpot (or your CRM)
+**Action:** Create Report in North Reports
+
+Automatically create a North Report whenever you add a new property listing to your CRM.
+
+**Setup:**
+1. Choose your CRM as the trigger
+2. Map property fields (address, price, beds, baths, etc.)
+3. Add North Reports "Create Report" action
+4. Map the CRM fields to North Reports fields
+5. Test and turn on your Zap
+
+### Example 2: North Report → Slack Notification
+
+**Trigger:** New Report in North Reports
+**Action:** Send Channel Message in Slack
+
+Get instant notifications in Slack whenever a new report is created.
+
+**Setup:**
+1. Choose "New Report" trigger from North Reports
+2. Filter by status if needed (optional)
+3. Add Slack "Send Channel Message" action
+4. Customize the message with report details
+5. Include the report URL for easy access
+
+### Example 3: Form Submission → North Report → Email
+
+**Trigger:** New Submission in Google Forms (or your form tool)
+**Action 1:** Create Report in North Reports
+**Action 2:** Send Email via Gmail
+
+Create a complete workflow: form submission → report creation → client notification.
+
+### Example 4: Zillow Listing → North Report
+
+**Trigger:** New Listing in Zillow (via RSS or webhook)
+**Action:** Create Report in North Reports
+
+Automatically generate North Reports for your new Zillow listings.
+
+### Example 5: Price Change → Update Report
+
+**Trigger:** Updated Record in Airtable (or your database)
+**Action:** Update Report in North Reports
+
+Keep your North Reports in sync when property prices change.
+
+## Advanced: Multi-Step Zaps
+
+### Complete Automation Workflow
+
+Create a multi-step Zap that:
+1. Triggers on a new CRM contact
+2. Creates a North Report
+3. Adds the report to a Google Sheet
+4. Sends a Slack notification
+5. Creates a task in Asana
+6. Sends an email to the client
+
+**Tips:**
+- Use filters to only process certain records
+- Add delays between steps if needed
+- Use formatters to transform data
+- Store data in Zapier's data store for lookups
+
+## Authentication
+
+North Reports uses API key authentication. When connecting your account:
+
+1. Enter your API key from the North Dashboard
+2. The key format is: `north_sk_live_xxxxx...`
+3. Keys are scoped to your account and team
+4. You can create multiple keys for different integrations
+
+<Warning>
+  Keep your API keys secure. Never share them publicly or commit them to version control.
+</Warning>
+
+## Rate Limits
+
+North Reports API has these limits:
+
+| Plan | Requests/Hour |
+|------|---------------|
+| Free | 1,000 |
+| Pro  | 5,000 |
+| Enterprise | 10,000 |
+
+Zapier automatically handles rate limiting and will retry requests if you hit limits.
+
+## Error Handling
+
+Zapier includes built-in error handling:
+
+- **Automatic retries** for transient failures
+- **Error notifications** via email or Slack
+- **Pause on error** option to prevent bad data
+- **Error logs** in the Zap history
+
+## Best Practices
+
+### 1. Use Filters
+
+Add filters to only process relevant records:
+- Only create reports for properties in certain cities
+- Only notify on published reports
+- Only update reports above a certain price
+
+### 2. Test Thoroughly
+
+Always test your Zaps with sample data before turning them on:
+- Use Zapier's test mode
+- Verify field mappings
+- Check for data formatting issues
+
+### 3. Monitor Your Zaps
+
+- Check Zap history regularly
+- Set up error notifications
+- Monitor your API usage
+
+### 4. Organize Your Zaps
+
+- Use descriptive names
+- Group related Zaps in folders
+- Document your workflows
+
+## Troubleshooting
+
+### Can't Find North Reports
+
+**Problem:** North Reports doesn't appear in Zapier search
+
+**Solutions:**
+- Make sure you've accepted the private app invitation
+- Try refreshing the page
+- Check that you're logged into the correct Zapier account
+- Contact support@northreports.com if the issue persists
+
+### Authentication Failed
+
+**Problem:** "Invalid API key" or "Authentication failed" error
+
+**Solutions:**
+- Verify your API key is correct (starts with `north_sk_live_`)
+- Check for extra spaces when copying the key
+- Generate a new API key from your dashboard
+- Make sure the key hasn't been revoked
+
+### Zap Not Triggering
+
+**Problem:** Zap isn't firing when expected
+
+**Solutions:**
+- Check the trigger settings and filters
+- Verify the trigger is turned on
+- Check Zap history for errors
+- Ensure your API key has the correct permissions
+
+### Data Mapping Issues
+
+**Problem:** Fields aren't mapping correctly
+
+**Solutions:**
+- Use Zapier's field mapper to select the correct fields
+- Check data types match (text, number, date, etc.)
+- Use formatters to transform data if needed
+- Test with sample data first
+
+## Support
+
+Need help? We're here for you:
+
+- **Email**: support@northreports.com
+- **Documentation**: [Full API Reference](/api-reference/introduction)
+- **Zapier Support**: [Zapier Help Center](https://help.zapier.com)
+
+## Next Steps
+
+- [View full API Reference](/api-reference/introduction)
+- [Check out Make.com Integration](/guides/make-integration)
+- [Explore Webhooks](/guides/webhooks)
+- [Learn about Rate Limits](/rate-limits)
+
