@@ -209,22 +209,25 @@ paths:
       summary: Get a specific report
       description: |
         Retrieves a single report with all its details including comparables, showings, and social media posts.
-        Use the report UUID in the path, or use the address query parameter to search by address.
+        You can search by UUID using the path parameter, or by address using the address query parameter.
+        If address is provided, it will override the reportId and search by address instead.
       tags:
         - Reports
       parameters:
         - name: reportId
           in: path
-          required: false
-          description: The report UUID
+          required: true
+          description: |
+            The report UUID. If searching by address, you can use any placeholder value (e.g., "search" or "by-address").
+            The address query parameter will override this value.
           schema:
             type: string
-            format: uuid
         - name: address
           in: query
           required: false
           description: |
             Search for a report by address instead of using reportId.
+            If provided, this will override the reportId path parameter.
             Supports partial matching (case-insensitive).
             Example: "123 Main St" or "Main Street"
           schema:
