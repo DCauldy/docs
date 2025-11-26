@@ -19,7 +19,7 @@ info:
   termsOfService: https://northreports.com/terms
 
 servers:
-  - url: https://zkqcqgjbsigjdwzmnwmp.supabase.co/functions/v1
+  - url: https://api.northreports.com/v1
     description: Production API
 
 security:
@@ -130,7 +130,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Successfully retrieved reports
+          description: Successfully retrieved report(s). Returns a single report when address parameter is provided, otherwise returns a list.
           content:
             application/json:
               schema:
@@ -209,17 +209,24 @@ paths:
       summary: Get a specific report
       description: |
         Retrieves a single report with all its details including comparables, showings, and social media posts.
-        You can search by either the report UUID or by address (supports partial matching).
+        Use the report UUID in the path, or use the address query parameter to search by address.
       tags:
         - Reports
       parameters:
         - name: reportId
           in: path
-          required: true
+          required: false
+          description: The report UUID
+          schema:
+            type: string
+            format: uuid
+        - name: address
+          in: query
+          required: false
           description: |
-            The report identifier. Can be either:
-            - A UUID (e.g., `550e8400-e29b-41d4-a716-446655440000`)
-            - An address (e.g., `123 Main St` or `Main Street`) - supports partial matching, case-insensitive
+            Search for a report by address instead of using reportId.
+            Supports partial matching (case-insensitive).
+            Example: "123 Main St" or "Main Street"
           schema:
             type: string
       responses:
